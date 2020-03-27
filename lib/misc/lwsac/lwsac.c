@@ -171,17 +171,22 @@ _lwsac_use(struct lwsac **head, size_t ensure, size_t chunk_size, char backfill)
 		bf->ofs += sizeof(*lachead);
 		lachead = (struct lwsac_head *)&bf[1];
 		memset(lachead, 0, sizeof(*lachead));
-	} else
+	} else {
+		assert(lachead);
 		if (lachead->curr)
 			lachead->curr->next = bf;
+	}
 
+	assert(lachead);
 	lachead->curr = bf;
 	bf->head = *head;
 	bf->next = NULL;
 	bf->alloc_size = alloc;
 
-	lachead->total_alloc_size += alloc;
-	lachead->total_blocks++;
+	if (lachead) {
+		lachead->total_alloc_size += alloc;
+		lachead->total_blocks++;
+	}
 
 do_use:
 
